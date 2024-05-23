@@ -80,6 +80,13 @@ namespace Server.Game
             int x = cellPosition.x - MinX;
             int y = MaxY - cellPosition.y;
 
+            Console.WriteLine(!collisionArr[y, x] && (!checkObjects || objects[y, x] == null));
+            
+            if (objects[y, x] is not null)
+            {
+                Console.WriteLine($"이건 또 뭐임 {objects[y, x]}");
+            }
+            
             return !collisionArr[y, x] && (!checkObjects || objects[y, x] == null);
         }
 

@@ -17,6 +17,7 @@ namespace Server.Game
         Dictionary<int, Player> players = new Dictionary<int, Player>();
         Dictionary<int, Monster> monsters = new Dictionary<int, Monster>();
         Dictionary<int, Projectile> projectiles = new Dictionary<int, Projectile>();
+        Dictionary<int, Item> items = new Dictionary<int, Item>();
 
         // 이 게임룸의 맵
         public Map Map { get; private set;} = new Map();
@@ -26,7 +27,7 @@ namespace Server.Game
             Map.LoadMap(mapId);
 
             Monster monster = ObjectManager.Instance.Add<Monster>();
-            monster.CellPosition = new Vector2Int(5, 5);
+            monster.CellPosition = new Vector2Int(4, 5);
             Push(EnterGame, monster);
         }
 
@@ -87,6 +88,11 @@ namespace Server.Game
                         spawnPacket.Objects.Add(p.Info);
                     }
 
+                    foreach (Item i in items.Values)
+                    {
+                        spawnPacket.Objects.Add(i.Info);
+                    }
+
                     player.Session.Send(spawnPacket);
                 }
             }
@@ -102,6 +108,12 @@ namespace Server.Game
                 Projectile projectile = gameObject as Projectile;
                 projectiles.Add(gameObject.Id, projectile);
                 projectile.Room = this;
+            }
+            else if (type == GameObjectType.Item)
+            {
+                Item item = gameObject as Item;
+                items.Add(gameObject.Id, item);
+                item.Room = this;
             }
 
             // 타인한테 정보 전송
@@ -154,6 +166,14 @@ namespace Server.Game
 
                 projectile.Room = null;
             }
+            else if (type == GameObjectType.Item)
+            {
+                Item item = null;
+                if (items.Remove(objectId, out item) == false)
+                    return;
+
+                item.Room = null;
+            }
 
             //타인한테 정보 전송
             {
@@ -186,6 +206,9 @@ namespace Server.Game
                     return;
             }
 
+            //아이템 확인
+            HandleItem(player, movePosInfo);
+            
             info.PositionInfo.State = movePosInfo.State;
             info.PositionInfo.MoveDir = movePosInfo.MoveDir;
             Map.ApplyMove(player, new Vector2Int(movePosInfo.PosX, movePosInfo.PosY));
@@ -258,6 +281,18 @@ namespace Server.Game
                         Push(EnterGame, bullet);
                     }
                     break;
+            }
+        }
+
+        public void HandleItem(Player player, PositionInfo moveInfo)
+        {
+            foreach (var item in items.Values)
+            {
+                if (item.PositionInfo.PosX == moveInfo.PosX && item.PositionInfo.PosY == moveInfo.PosY)
+                {
+                    Console.WriteLine("아이템 발견");
+                    Push(LeaveGame, item.Id);
+                }
             }
         }
 

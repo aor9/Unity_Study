@@ -19,6 +19,7 @@ public class ObjectManager
     public void Add(ObjectInfo info, bool myPlayer = false)
     {
         GameObjectType objectType = GetObjectTypeById(info.ObjectId);
+        Debug.Log(objectType);
         if (objectType == GameObjectType.Player)
         {
             if (myPlayer)
@@ -78,6 +79,17 @@ public class ObjectManager
             bulletController.Stat = info.StatInfo;
             bulletController.SyncPosition();
         }
+        else if (objectType == GameObjectType.Item)
+        {
+            Debug.Log("아이템 드롭");
+            //TODO : item Prefab 제작
+            GameObject gold = Managers.Resource.Instantiate("Creature/Gold");
+            gold.name = "Gold";
+            _objects.Add(info.ObjectId, gold);
+
+            GoldController goldController = gold.GetComponent<GoldController>();
+            goldController.PositionInfo = info.PositionInfo;
+        }
     }
     public void Remove(int id)
     {
@@ -85,6 +97,16 @@ public class ObjectManager
         if(unit == null)
         {
             return;
+        }
+
+        GoldController goldController = null;
+        if (unit.TryGetComponent<GoldController>(out goldController))
+        {
+            Debug.Log("골드 획득");
+            Debug.Log($"{goldController.PositionInfo.PosX}, {goldController.PositionInfo.PosY}" );
+            Debug.Log($"{MyPlayer.PositionInfo.PosX}, {MyPlayer.PositionInfo.PosY}" );
+            GameScene gameScene = GameObject.Find("@GameScene").GetComponent<GameScene>();
+            gameScene.UpdateGold();
         }
         
         _objects.Remove(id);

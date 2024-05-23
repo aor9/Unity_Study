@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.Protocol;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -138,25 +139,31 @@ namespace Server.Game
 
             if (Stat.Hp <= 0)
             {
-                OnDead(attacker);
+                Vector2Int position = new Vector2Int(PositionInfo.PosX, PositionInfo.PosY);
+                OnDead(attacker, position);
             }
         }
 
-        public virtual void OnDead(GameObject attacker)
+        public virtual void OnDead(GameObject attacker, Vector2Int position)
         {
             if(Room is null)
             {
                 return;
             }
+            
+            
+            GameRoom room = Room;
 
             S_Die diePacket = new S_Die();
             diePacket.ObjectId = Id;
             diePacket.AttackerId = attacker.Id;
             Room.Broadcast(diePacket);
 
-            GameRoom room = Room;
-
-            room.Push(room.LeaveGame, Id);
+            room.LeaveGame(Id);
+            
+            Item item = ObjectManager.Instance.Add<Item>();
+            item.CellPosition = new Vector2Int(position.x, position.y);
+            room.Push(room.EnterGame, item);
 
             Stat.Hp = Stat.MaxHp;
             PositionInfo.State = CreatureState.Idle;
@@ -165,15 +172,7 @@ namespace Server.Game
             PositionInfo.PosY = 0;
 
             room.Push(room.EnterGame, this);
-
-            //TODO : 아이템 드롭
         }
-
-        public virtual void ItemDrop(GameObject gameObject)
-        {
-            /* Monster monster = ObjectManager.Instance.Add<Monster>();
-            monster.CellPosition = new Vector2Int(5, 5);
-            EnterGame(monster);*/
-        }
+        
     }
 }

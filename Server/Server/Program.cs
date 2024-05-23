@@ -53,7 +53,7 @@ namespace Server
 			while (true)
 			{
 				//JobTimer.Instance.Flush();
-				Thread.Sleep(100);
+				Thread.Sleep(10);
 			}
 		}
 	}

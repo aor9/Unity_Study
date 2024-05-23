@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameScene : BaseScene
 {
     private HpBar hpBar;
     public MyPlayerController MyPlayer { get; set; }
+    public TMP_Text text;
+    private int gold = 0;
     
     protected override void Init()
     {
@@ -19,22 +23,8 @@ public class GameScene : BaseScene
         
         GameObject go = GameObject.Find("HpBar");
         hpBar = go.GetComponent<HpBar>();
-
-        // GameObject player = Managers.Resource.Instantiate("Creature/Player");
-        // player.name = "Player";
-        // Managers.Object.Add(player);
-
-        //Managers.UI.ShowSceneUI<UI_Inven>();
-        //Dictionary<int, Data.Stat> dict = Managers.Data.StatDict;
-        //gameObject.GetOrAddComponent<CursorController>();
-
-        //GameObject player = Managers.Game.Spawn(Define.WorldObject.Player, "UnityChan");
-        //Camera.main.gameObject.GetOrAddComponent<CameraController>().SetPlayer(player);
-
-        ////Managers.Game.Spawn(Define.WorldObject.Monster, "Knight");
-        //GameObject go = new GameObject { name = "SpawningPool" };
-        //SpawningPool pool = go.GetOrAddComponent<SpawningPool>();
-        //pool.SetKeepMonsterCount(2);
+        
+        SetText();
     }
 
     public override void Clear()
@@ -56,5 +46,16 @@ public class GameScene : BaseScene
         }
         
         hpBar.SetHpBar(ratio);
+    }
+
+    public void SetText()
+    {
+        text.text = gold.ToString();
+    }
+
+    public void UpdateGold()
+    {
+        gold += 5;
+        SetText();
     }
 }

@@ -33,8 +33,6 @@ namespace Server.Game
                 movePacket.ObjectId = Id;
                 movePacket.PositionInfo = PositionInfo;
                 Room.Broadcast(movePacket);
-
-                Console.WriteLine("Move Arrow");
             }
             else
             {

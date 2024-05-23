@@ -17,9 +17,9 @@ namespace Server.Game
             base.OnDamaged(attacker, damage);
         }
 
-        public override void OnDead(GameObject attacker)
+        public override void OnDead(GameObject attacker, Vector2Int position)
         {
-            base.OnDead(attacker);
+            base.OnDead(attacker, position);
         }
     }
 }
